@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import hero from '/hero.png'
 import Search from './components/Search'
-import Spinner from './components/Spinner';
-import MovieCard from './components/MovieCard';
+import Spinner from './components/Spinner'
+import MovieCard from './components/MovieCard'
+import { useDebounce} from 'react-use'
 
 const API_BASE_URL = 'https://api.themoviedb.org/3/';
 
@@ -21,13 +22,20 @@ const App = () => {
   const [errorMessage, setErrorMesssage] = useState(null);
   const [movieList, setMovieList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
 
-  const fetchMovies = async () => {
+  // oddálený příkaz vyhledávání, aby se zabránilo příliš velkému množství požadavků na API
+  // čeká až uživatelpřestane psát 500ms
+  useDebounce(() => setDebouncedSearchTerm(searchTerm), 500, [searchTerm]);
+
+  const fetchMovies = async ( query = '' ) => {
     setIsLoading(true);
     setErrorMesssage('');
 
     try {
-      const endpoint = `${API_BASE_URL}/discover/movie?sort_by=popularity.desc&language=cs-CZ`;
+      const endpoint =  query
+      ? `${API_BASE_URL}/search/movie?query=${encodeURIComponent(query)}&language=cs-CZ`
+      : `${API_BASE_URL}/discover/movie?sort_by=popularity.desc&language=cs-CZ`;
 
       const response = await fetch(endpoint, API_OPTIONS);
 
@@ -53,8 +61,8 @@ const App = () => {
   }
 
   useEffect(() => {
-    fetchMovies();
-  }, []);
+    fetchMovies(debouncedSearchTerm);
+  }, [debouncedSearchTerm]);
 
   return (
     <main>

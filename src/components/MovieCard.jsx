@@ -1,12 +1,11 @@
 import React from 'react'
-import noMovie from '/no-movie.png'
 import star from '/star.svg'
 
 const MovieCard = ( { movie: { title, vote_average, poster_path, release_date, original_language } }) => {
   return (
     <div className="movie-card">
 
-        <img src={poster_path ? `https://image.tmdb.org/t/p/w500/${poster_path}` : {noMovie}} alt={title} />
+        <img src={poster_path ? `https://image.tmdb.org/t/p/w500/${poster_path}` : './no-movie.png'} alt={title} />
 
     <div className="mt-4">
         <h3>{title}</h3>
